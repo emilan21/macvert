@@ -1,0 +1,8 @@
+.eggs
+build
+dist
+macvert.egg-info
+AUTHORS
+ChangeLog
+mac_convertor_vscode
+myvenv

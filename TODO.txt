@@ -1,0 +1,16 @@
+Add error checking
+	- check mac address is a mac address
+	- check if input and output type are correct
+
+Write test/ learn more about unit testing
+	- Test to generate list of mac addresses in the various formats and run them through the program
+
+Clean up Operations class if possible
+
+Change mac_converter.py to cli.py and mac_operations.py to just operations
+
+Make cli interface to the mac operations library
+
+Finish documenttion wiht sphinx
+
+use tox
