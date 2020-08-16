@@ -17,8 +17,6 @@ def index():
 		# Get Mac Addresses
 		try:
 			macs.append(request.form['macs'])
-			macs.split("\r")	
-			print(macs)
 			input_type = request.form['input_type']
 			output_type = request.form['output_type']
 			conmacs.append(convert_mac(macs, input_type, output_type))
