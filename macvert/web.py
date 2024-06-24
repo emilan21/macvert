@@ -3,7 +3,7 @@
 import os
 import requests
 from flask import Flask, render_template, request
-import macvert.logic
+from logic import convert_mac
 
 app = Flask(__name__)
 
@@ -13,19 +13,18 @@ def index():
     errors = []
     results = {}
     conmacs = []
-    macs = []
     if request.method == "POST":
         # Get Mac Addresses
         try:
-            macs.append(request.form['macs'])
+            mac_list = list(request.form['macs'].split("\r\n"))
             input_type = request.form['input_type']
             output_type = request.form['output_type']
             conmacs.append(
-                macvert.logic.convert_mac(macs, input_type, output_type))
+                convert_mac(mac_list, input_type, output_type))
         except:
             errors.append("Unable to get mac addresses. Please try again.")
 
     return render_template('index.html',
                            errors=errors,
                            results=results,
-                           conmacs=conmacs)
+                           conmacs=conmacs[0])

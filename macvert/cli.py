@@ -4,6 +4,8 @@
 
 #from macvert.mac_operations import Operations
 from mac_operations import Operations
+from web import app
+from logic import convert_mac
 import argparse
 import os
 import sys
@@ -67,13 +69,10 @@ if args.command == "cli":
 
     if args.file:
         macs = args.file.readlines()
-        for mac in macs:
-            mac_op = Operations(mac, args.input_type, args.output_type)
-            if len(macs) == 1:
-                print(mac_op.get_mac())
-            else:
-                print(mac_op.get_mac(), end="\n")
+        new_macs = convert_mac(macs, args.input_type, args.output_type)
+        print(*new_macs, sep="\n")
 
 if args.command == "server":
     if args.port:
-        app.run()	
+        print('Server starting...')
+        app.run(host='0.0.0.0', port=args.port)	
