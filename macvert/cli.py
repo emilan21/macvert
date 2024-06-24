@@ -48,8 +48,8 @@ server_p.add_argument('-p', '--port', nargs='?', default=5000, type=int)
 
 args = parser.parse_args()
 
-if args == ["cli]":
-	print args	
+if args == ["cli"]:
+	print(args)	
 
 # Check if mac addresses were entered on the cli or a file was passed
 if args.mac_addresses:
@@ -59,7 +59,7 @@ if args.mac_addresses:
 		if len(macs) == 1:
 			print(mac_op.get_mac())
 		else:
-			print(mac_op.get_mac(), end=" ")
+			print(mac_op.get_mac(), end="\n")
 elif args.file:
 	macs = args.file.readlines()
 	for mac in macs:
@@ -67,6 +67,6 @@ elif args.file:
 		if len(macs) == 1:
 			print(mac_op.get_mac())
 		else:
-			print(mac_op.get_mac(), end=" ")
+			print(mac_op.get_mac(), end="\n")
 elif args.port:
 	app.run()	

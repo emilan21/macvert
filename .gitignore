@@ -10,3 +10,4 @@ myvenv
 .tox
 .vscode
 venv
+*__pycache__*
