@@ -1,30 +1,25 @@
-# web.py - Flash ui
+"""Optional local Flask interface."""
 
-import os
-import requests
 from flask import Flask, render_template, request
-from logic import convert_mac
+
+from macvert.logic import convert_mac
+from macvert.mac_operations import FORMATS
 
 app = Flask(__name__)
 
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/", methods=["GET", "POST"])
 def index():
     errors = []
-    results = {}
-    conmacs = []
+    converted = []
     if request.method == "POST":
-        # Get Mac Addresses
         try:
-            mac_list = list(request.form['macs'].split("\r\n"))
-            input_type = request.form['input_type']
-            output_type = request.form['output_type']
-            conmacs.append(
-                convert_mac(mac_list, input_type, output_type))
-        except:
-            errors.append("Unable to get mac addresses. Please try again.")
-
-    return render_template('index.html',
-                           errors=errors,
-                           results=results,
-                           conmacs=conmacs[0])
+            input_type = request.form["input_type"]
+            output_type = request.form["output_type"]
+            if input_type not in FORMATS or output_type not in FORMATS:
+                raise ValueError("Unknown MAC address format")
+            addresses = request.form["macs"].splitlines()
+            converted = convert_mac(addresses, input_type, output_type)
+        except (KeyError, ValueError) as error:
+            errors.append(str(error))
+    return render_template("index.html", errors=errors, results={}, conmacs=converted)

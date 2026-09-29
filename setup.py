@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+from setuptools import setup
 
-# Basic setup.py file
-
-import setuptools
-
-setuptools.setup(setup_requires=['pbr'], pbr=True)
+setup()

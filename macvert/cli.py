@@ -1,80 +1,43 @@
-#!/usr/bin/python
+"""Command-line and optional Flask entry points."""
 
-# cli.py - cli front end to program
-
-# from macvert.mac_operations import Operations
-from mac_operations import Operations
-from web import app
-from logic import convert_mac
 import argparse
-import os
 import sys
 
-sys.path += [os.path.abspath('..')]
+from macvert.logic import convert_mac
+from macvert.mac_operations import FORMATS
 
-# Handle command line args
-parser = argparse.ArgumentParser(
-    description='Process some mac addresses.',
-    formatter_class=argparse.RawTextHelpFormatter)
-subparser = parser.add_subparsers(help='Specify cli or server', dest='command')
 
-# Cli args
-cli_p = subparser.add_parser(
-    'cli', help='cli option for mac addresses on the cli')
-cli_p.add_argument('-m', '--mac-addresses', nargs='+',
-                   help='Enter one or more mac addresses' +
-                   'seperated by a space')
-cli_p.add_argument(
-    '-f',
-    '--file',
-    type=argparse.FileType('r'),
-    help='File containing mac addresses.')
-cli_p.add_argument('-i', '--input-type', required=True,
-                   help='''
-Type of mac address notation the input is in.
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Convert 48-bit MAC addresses")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    cli = subparsers.add_parser("cli", help="Convert addresses from arguments or a file")
+    source = cli.add_mutually_exclusive_group(required=True)
+    source.add_argument("-m", "--mac-addresses", nargs="+", metavar="MAC")
+    source.add_argument("-f", "--file", type=argparse.FileType("r"))
+    cli.add_argument("-i", "--input-type", choices=FORMATS, required=True)
+    cli.add_argument("-o", "--output-type", choices=FORMATS, required=True)
+    server = subparsers.add_parser("server", help="Start the optional Flask interface")
+    server.add_argument("-p", "--port", default=5000, type=int)
+    args = parser.parse_args(argv)
 
-The mac address types are:
-	- colon
-	- hp
-	- no_delimiter
-	- dash
-	''')
-cli_p.add_argument('-o', '--output-type', required=True,
-                   help='''
-Type of mac address notation you want the mac address in.
+    if args.command == "server":
+        from macvert.web import app
 
-The mac address types are:
-	- colon
-	- hp
-	- no_delimiter
-	- dash
-	''')
+        app.run(host="127.0.0.1", port=args.port)
+        return 0
 
-# Server args
-server_p = subparser.add_parser(
-    'server', help='server option for running a web server to handle mac addreses')
-server_p.add_argument('-p', '--port', nargs='?', default=5000, type=int)
+    try:
+        if args.file:
+            with args.file:
+                addresses = [line for line in args.file.read().splitlines() if line.strip()]
+        else:
+            addresses = args.mac_addresses
+        print("\n".join(convert_mac(addresses, args.input_type, args.output_type)))
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        return 2
+    return 0
 
-args = parser.parse_args()
-print(args)
 
-if args.command == "cli":
-    # Check if mac addresses were entered on the cli or a file was passed
-    if args.mac_addresses:
-        macs = args.mac_addresses
-        for mac in macs:
-            mac_op = Operations(mac, args.input_type, args.output_type)
-            if len(macs) == 1:
-                print(mac_op.get_mac())
-            else:
-                print(mac_op.get_mac(), end="\n")
-
-    if args.file:
-        macs = args.file.readlines()
-        new_macs = convert_mac(macs, args.input_type, args.output_type)
-        print(*new_macs, sep="\n")
-
-if args.command == "server":
-    if args.port:
-        print('Server starting...')
-        app.run(host='0.0.0.0', port=args.port)
+if __name__ == "__main__":
+    raise SystemExit(main())

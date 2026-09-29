@@ -1,12 +1,7 @@
-#!/usr/bin/python
+"""Batch conversion for the CLI and web adapter."""
 
-# logic.py
-from mac_operations import Operations
+from macvert.mac_operations import Operations
 
 
 def convert_mac(macs, input_type, output_type):
-    new_macs = []
-    for mac in macs:
-        mac_op = Operations(mac, input_type, output_type)
-        new_macs.append(mac_op.get_mac())
-    return new_macs
+    return [Operations(mac, input_type, output_type).get_mac() for mac in macs]
